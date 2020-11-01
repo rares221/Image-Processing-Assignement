@@ -191,5 +191,24 @@ namespace ISIP_FrameworkGUI
                 }
             }
         }
+        private void ATH_Click(object sender, RoutedEventArgs e)
+        {
+            int dim;
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+
+                UserInputDialog dlg = new UserInputDialog("Dimensiune fereastra ", new string[] { "dim", "b" });
+                float b;
+
+                if (dlg.ShowDialog().Value == true)
+                {
+                    dim = (int)dlg.Values[0];
+                    b = (float)dlg.Values[1];
+
+                    mainControl.ProcessedGrayscaleImage = Tools.AdaptativBinarization(mainControl.OriginalGrayscaleImage, dim, b);
+                }
+            }
+
+        }
     }
 }

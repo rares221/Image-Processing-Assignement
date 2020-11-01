@@ -28,6 +28,7 @@
                 <MenuItem Header="GLevels_on_Row" Name="GL_ROW_ON" IsCheckable="True" Click="GL_ROW_ON_Click" IsEnabled="False"/>
                 <MenuItem Header="Invert" Click="Invert_Click"/>
                 <MenuItem Header="Gamma Operator" Click="Gamma_Operator_Click"/>
+                <MenuItem Header="Adaptive Binarization" Click="ATH_Click"/>
 
             </MenuItem>
             <MenuItem Header="Filters">
