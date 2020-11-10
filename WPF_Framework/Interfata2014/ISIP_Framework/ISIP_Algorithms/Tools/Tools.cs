@@ -67,51 +67,64 @@ namespace ISIP_Algorithms.Tools
 
                 }
             }
-            float sum;
-            for (int y = 0; y < InputImage.Height - dim; y++)
+            for (int y = dim / 2; y < InputImage.Height - dim / 2; y++)
             {
-                for (int x = 0; x < InputImage.Width - dim; x++)
+                for (int x = dim / 2; x < InputImage.Width - dim / 2; x++)
                 {
-                    int x1 = x + dim - 1;
-                    int y1 = y + dim - 1;
-                    if (y == 0 && x == 0)
+
+                    int x0 = x - dim / 2;
+                    int y0 = y - dim / 2;
+                    int x1 = x + dim / 2;
+                    int y1 = y + dim / 2;
+
+                    double sum;
+                    double mu;
+
+                    if (x0 == 0 && y0 == 0)
                     {
-                        sum = imagineIntegrala[y, x];
-                        T[y1, x1] = b * (sum / (dim * dim));
-                        if (InputImage.Data[y1, x1, 0] < T[y1, x1])
-                            Result.Data[y1, x1, 0] = 0;
-                        else Result.Data[y1, x1, 0] = 255;
-                    }
-                    else if (x == 0)
-                    {
-                        sum = imagineIntegrala[y1, x1] - imagineIntegrala[y - 1, x1];
-                        T[y1, x1] = b * (sum / (dim * dim));
-                        if (InputImage.Data[y1, x1, 0] < T[y1, x1])
-                            Result.Data[y1, x1, 0] = 0;
-                        else Result.Data[y1, x1, 0] = 255;
+                        sum = imagineIntegrala[y1, x1];
+                        mu = sum / (dim * dim);
 
                     }
-                    else if (y == 0)
+                    else if (y0 == 0)
                     {
-                        sum = imagineIntegrala[y1, x1] - imagineIntegrala[y1, x - 1];
-                        T[y1, x1] = b * (sum / (dim * dim));
-                        if (InputImage.Data[y1, x1, 0] < T[y1, x1])
-                            Result.Data[y1, x1, 0] = 0;
-                        else Result.Data[y1, x1, 0] = 255;
+                        sum = imagineIntegrala[y1, x1] -
+                              imagineIntegrala[y1, x0 - 1];
+                        mu = sum / (dim * dim);
+
+                    }
+                    else if (x0 == 0)
+                    {
+                        sum = imagineIntegrala[y1, x1] -
+                              imagineIntegrala[y0 - 1, x1];
+                        mu = sum / (dim * dim);
+
                     }
                     else
                     {
-                        sum = imagineIntegrala[y1, x1] + imagineIntegrala[y - 1, x - 1] - imagineIntegrala[y - 1, x1] - imagineIntegrala[y1, x - 1];
-                        T[y1, x1] = b * (sum / (dim * dim));
-                        if (InputImage.Data[y1, x1, 0] < T[y1, x1])
-                            Result.Data[y1, x1, 0] = 0;
-                        else Result.Data[y1, x1, 0] = 255;
+                        sum = imagineIntegrala[y1, x1] +
+                              imagineIntegrala[y0 - 1, x0 - 1] -
+                              imagineIntegrala[y1, x0 - 1] -
+                              imagineIntegrala[y0 - 1, x1];
+                        mu = sum / (dim * dim);
+
+                    }
+
+
+                    if (InputImage.Data[y, x, 0] < b * mu)
+                    {
+                        Result.Data[y, x, 0] = 0;
+                    }
+                    else
+                    {
+                        Result.Data[y, x, 0] = 255;
                     }
 
                 }
             }
 
             return Result;
+
         }
 
 
