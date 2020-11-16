@@ -29,6 +29,7 @@
                 <MenuItem Header="Invert" Click="Invert_Click"/>
                 <MenuItem Header="Gamma Operator" Click="Gamma_Operator_Click"/>
                 <MenuItem Header="Adaptive Binarization" Click="ATH_Click"/>
+                <MenuItem Header="Median Filter" Click="Med_Click"/>
 
             </MenuItem>
             <MenuItem Header="Filters">

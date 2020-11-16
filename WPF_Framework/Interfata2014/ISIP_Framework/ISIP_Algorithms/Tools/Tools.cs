@@ -126,6 +126,37 @@ namespace ISIP_Algorithms.Tools
             return Result;
 
         }
+        private static int Median(int y, int x, Image<Gray, byte> InputImage, int mask)
+        {
+            List<int> pixels = new List<int>();
+
+            for (int i = 0; i < mask * mask - 1; i++)
+            {
+                int x1 = i / mask;
+                int y1 = i % mask;
+                pixels.Add(InputImage.Data[y1 + y, x1 + x, 0]);
+
+            }
+
+            pixels.Sort();
+            int value = pixels.ElementAt(pixels.Count() / 2);
+            return value;
+        }
+        public static Image<Gray, byte> MedianFilter(Image<Gray, byte> InputImage, int mask)
+        {
+            Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
+            for (int y = 0; y < InputImage.Height; y++)
+            {
+                for (int x = 0; x < InputImage.Width; x++)
+                {
+                    if (y >= InputImage.Height - mask - 1 || x >= InputImage.Width - mask - 1 || x < mask || y < mask)
+                        Result.Data[y, x, 0] = (byte)InputImage.Data[y, x, 0];
+                    else
+                        Result.Data[y, x, 0] = (byte)Median(y, x, InputImage, mask);
+                }
+            }
+            return Result;
+        }
 
 
 

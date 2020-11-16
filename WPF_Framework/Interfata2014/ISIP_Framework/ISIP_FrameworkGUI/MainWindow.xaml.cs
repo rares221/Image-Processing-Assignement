@@ -210,5 +210,15 @@ namespace ISIP_FrameworkGUI
             }
 
         }
+        private void Med_Click(object sender, RoutedEventArgs e)
+        {
+            UserInputDialog dlg = new UserInputDialog("Dimensiune masca ", new string[] { "dim"});
+            if (dlg.ShowDialog().Value == true)
+            {
+                int dim = (int)dlg.Values[0];
+                mainControl.ProcessedGrayscaleImage = Tools.MedianFilter(mainControl.OriginalGrayscaleImage, dim);
+            }
+
+        }
     }
 }
