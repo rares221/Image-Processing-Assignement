@@ -220,5 +220,18 @@ namespace ISIP_FrameworkGUI
             }
 
         }
+        private void Sob_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                UserInputDialog dlg = new UserInputDialog("Prag", new string[] { "Prag" });
+
+                if (dlg.ShowDialog().Value)
+                {
+                    int t = (int)dlg.Values[0];
+                    mainControl.ProcessedGrayscaleImage = Tools.SobelDirectional(mainControl.OriginalGrayscaleImage, t);
+                }
+            }
+        }
     }
 }

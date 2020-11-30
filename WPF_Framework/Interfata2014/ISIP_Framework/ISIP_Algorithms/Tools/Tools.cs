@@ -25,11 +25,11 @@ namespace ISIP_Algorithms.Tools
         {
             double a = 255 / Math.Pow(255, gamma);
             List<double> LUT = new List<double>();
-            for(int i=0;i<256;i++)
+            for (int i = 0; i < 256; i++)
             {
                 double f = (byte)(a * Math.Pow(i, gamma));
                 LUT.Add((double)f);
-               
+
             }
             return LUT;
         }
@@ -42,7 +42,7 @@ namespace ISIP_Algorithms.Tools
             {
                 for (int x = 0; x < InputImage.Width; x++)
                 {
-                    Result.Data[y, x, 0] = (byte)(Lookup.ElementAt (InputImage.Data[y, x, 0]));
+                    Result.Data[y, x, 0] = (byte)(Lookup.ElementAt(InputImage.Data[y, x, 0]));
                 }
             }
             return Result;
@@ -157,12 +157,61 @@ namespace ISIP_Algorithms.Tools
             }
             return Result;
         }
+        public static Image<Gray, byte> SobelDirectional(Image<Gray, byte> InputImage, int t)
+        {
+            Image<Gray, byte> Result = InputImage.Clone();
+            int[,] Sx = new int[3, 3];
+            int[,] Sy = new int[3, 3];
 
+            int[] numbers = new int[] { 1, 2, 1 };
 
+            int fx, fy;
+            int grad = 0;
+            int teta = 0;
+            int partResult = 0;
 
+            for (int i = 0; i < 3; i++)
+            {
+                Sx[i, 0] = -numbers[i];
+                Sx[i, 2] = numbers[i];
+                Sy[0, i] = -numbers[i];
+                Sy[2, i] = numbers[i];
+            }
 
+            
+            for (int y = 1; y < InputImage.Height - 1; y++)
+            {
+                for (int x = 1; x < InputImage.Width - 1; x++)
+                {
+                    fx = 0;
+                    fy = 0;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        for (int j = 0; j < 3; j++)
+                        {
+                            fx += (InputImage.Data[y - 1 + i, x - 1 + j, 0] * Sx[i, j]);
+                            fy += (InputImage.Data[y - 1 + i, x - 1 + j, 0] * Sy[i, j]);
+                        }
+                    }
+                    grad = (int)Math.Sqrt(fx * fx + fy * fy);
+                    if (grad < t)
+                    {
+                        Result.Data[y, x, 0] = 0;
+                    }
+                    else
+                    {
+                        teta = (int)(Math.Atan2(fx, fy) * (180 / Math.PI));
+                        partResult = (((teta + 180) * (255 - 127)) / 360) + 127;
+                        Result.Data[y, x, 0] = (byte)partResult;
+                    }
+                }
+            }
 
-
-
+            return Result;
+        }
+        
     }
+
 }
+
+

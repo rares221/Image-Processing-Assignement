@@ -29,11 +29,13 @@
                 <MenuItem Header="Invert" Click="Invert_Click"/>
                 <MenuItem Header="Gamma Operator" Click="Gamma_Operator_Click"/>
                 <MenuItem Header="Adaptive Binarization" Click="ATH_Click"/>
-                <MenuItem Header="Median Filter" Click="Med_Click"/>
+                
 
             </MenuItem>
             <MenuItem Header="Filters">
-                             
+                <MenuItem Header="Median Filter" Click="Med_Click"/>
+                <MenuItem Header="Sobel Directional Filter" Click="Sob_Click"/>
+
             </MenuItem>
             <MenuItem Header="Save as original image" HorizontalAlignment="Right"
                       Click="saveAsOriginalMenuItem_Click"/>
