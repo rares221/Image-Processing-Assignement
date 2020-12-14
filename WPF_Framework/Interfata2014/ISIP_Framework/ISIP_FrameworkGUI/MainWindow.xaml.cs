@@ -220,6 +220,27 @@ namespace ISIP_FrameworkGUI
             }
 
         }
+      
+        private void Bil_Click(object sender, RoutedEventArgs e)
+        {
+            double sigmaD;
+            double sigmaR;
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+
+                UserInputDialog dlg = new UserInputDialog("Introduceti cele doua sigma", new string[] { "t1", "t2" });
+
+                if (dlg.ShowDialog().Value == true)
+                {
+                    sigmaD = (double)dlg.Values[0];
+                    sigmaR = (double)dlg.Values[1];
+
+                    mainControl.ProcessedGrayscaleImage = Tools.BilateralFilter(mainControl.OriginalGrayscaleImage, sigmaD, sigmaR);
+                    
+                }
+            }
+
+        }
         private void Sob_Click(object sender, RoutedEventArgs e)
         {
             if (mainControl.OriginalGrayscaleImage != null)
@@ -232,6 +253,20 @@ namespace ISIP_FrameworkGUI
                     mainControl.ProcessedGrayscaleImage = Tools.SobelDirectional(mainControl.OriginalGrayscaleImage, t);
                 }
             }
+        }
+        private void Xor_Click(object sender,RoutedEventArgs e)
+        {
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                UserInputDialog dlg = new UserInputDialog("Prag", new string[] { "Prag pentru binarizare" });
+
+                if (dlg.ShowDialog().Value)
+                {
+                    int t = (int)dlg.Values[0];
+                    mainControl.ProcessedGrayscaleImage = Tools.Xor(t, mainControl.OriginalGrayscaleImage);
+                }
+            }
+
         }
     }
 }

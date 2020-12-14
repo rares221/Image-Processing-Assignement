@@ -31,12 +31,16 @@
                 <MenuItem Header="Adaptive Binarization" Click="ATH_Click"/>
                 
 
+
             </MenuItem>
             <MenuItem Header="Filters">
                 <MenuItem Header="Median Filter" Click="Med_Click"/>
                 <MenuItem Header="Sobel Directional Filter" Click="Sob_Click"/>
+                <MenuItem Header="Filtru Bilateral" Click="Bil_Click"/>
 
             </MenuItem>
+            <MenuItem Header="XOR" Click="Xor_Click"/>
+            
             <MenuItem Header="Save as original image" HorizontalAlignment="Right"
                       Click="saveAsOriginalMenuItem_Click"/>
         </Menu>

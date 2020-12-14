@@ -157,6 +157,76 @@ namespace ISIP_Algorithms.Tools
             }
             return Result;
         }
+        public static Image<Gray, byte> BilateralFilter(Image<Gray, byte> InputImage, double sigmaD,double sigmaR)
+        {
+            Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
+            int dim;
+            double pi = Math.PI;
+            double e = Math.E;
+            dim = (int)(sigmaD * 4) + 1;
+
+            if (dim % 2 == 0)
+            {
+                dim++;
+            }
+
+            double[,] mat = new double[dim, dim];
+            for (int i = 0; i < dim; i++)
+            {
+                for (int j = 0; j < dim; j++)
+                {
+                    mat[i, j] = (1 / (2 * pi * Math.Pow(sigmaD, 2)) * Math.Pow(e, -((i - dim / 2) * (i - dim / 2) + (j - dim / 2) * (j - dim / 2)) / (2 * Math.Pow(sigmaD, 2))));
+                }
+            }
+
+            double c = 0;
+            double sum = 0;
+            for (int i = 0; i < dim; i++)
+            {
+                for (int j = 0; j < dim; j++)
+                {
+                    sum += mat[i, j];
+                }
+            }
+            c = 1 / sum;
+            for (int i = 0; i < dim; i++)
+            {
+                for (int j = 0; j < dim; j++)
+                {
+                    mat[i, j] = mat[i, j] * c;
+                }
+            }
+
+            for (int y = dim / 2; y < InputImage.Height - (dim / 2); y++)
+            {
+                for (int x = dim / 2; x < InputImage.Width - (dim / 2); x++)
+                {
+                    double sum1 = 0;
+                    double sum2 = 0;
+                    double  diff1 = 0;
+                    for (int i = 0; i < dim; i++)
+                    {
+                        for (int j = 0; j < dim; j++)
+                        {
+                            diff1 = mat[x, y] - mat[x + i, y + j];
+                            sum1 += InputImage.Data[y + i - dim / 2, x + j - dim / 2, 0] * mat[i, j]*Hr(diff1,sigmaR);
+                            sum2=mat[i, j] * Hr(diff1, sigmaR);
+                        }
+                    }
+                    Result.Data[y, x, 0] = (byte)((sum1/sum2) + 0.5);
+                }
+            }
+            return Result;
+        }
+        public static double Hr( double diff, double sigmaR)
+        {
+
+            double e = Math.E;
+            return Math.Pow(e, (-(diff * diff) / 2 * (sigmaR * sigmaR)));
+
+
+        }
+     
         public static Image<Gray, byte> SobelDirectional(Image<Gray, byte> InputImage, int t)
         {
             Image<Gray, byte> Result = InputImage.Clone();
@@ -209,7 +279,86 @@ namespace ISIP_Algorithms.Tools
 
             return Result;
         }
-        
+        public static Image<Gray, byte> BinarizareSimpla(Image<Gray, byte> InputImage, double threshold)
+        {
+            Image<Gray, byte> Result = InputImage.Clone();
+            for (int y = 0; y < InputImage.Height; y++)
+            {
+                for (int x = 0; x < InputImage.Width; x++)
+                {
+                    if ((int)Result.Data[y, x, 0] <= threshold)
+                        Result.Data[y, x, 0] = (Byte)0;
+                    else
+                        Result.Data[y, x, 0] = (Byte)255;
+                }
+            }
+            return Result;
+        }
+        public static Image<Gray, byte> Xor(double thresold, Image<Gray, byte> originalImage)
+        {
+            Image<Gray, byte> resultImage1 = new Image<Gray, byte>(originalImage.Size);
+            Image<Gray, byte> resultImageXor = new Image<Gray, byte>(resultImage1.Size);
+            Image<Gray, byte> resultImage2 = new Image<Gray, byte>(resultImage1.Data);
+
+            resultImage1 = BinarizareSimpla( originalImage, thresold);
+
+            
+            // partea de erodare
+
+            for (int y = 1; y < resultImage1.Height - 1; y++)
+            {
+                for (int x = 1; x < resultImage1.Width - 1; x++)
+                {
+                    if (resultImage1.Data[y, x, 0] == 255 && resultImage1.Data[y, x - 1, 0] == 0)
+                    {
+                        resultImage2.Data[y, x, 0] = 0;
+                    }
+                    else
+                         if (resultImage1.Data[y, x, 0] == 255 && resultImage1.Data[y - 1, x - 1, 0] == 0)
+                    {
+                        resultImage2.Data[y, x, 0] = 0;
+                    }
+                    else
+                         if (resultImage1.Data[y, x, 0] == 255 && resultImage1.Data[y - 1, x, 0] == 0)
+                    {
+                        resultImage2.Data[y, x, 0] = 0;
+                    }
+                    else
+                         if (resultImage1.Data[y, x, 0] == 255 && resultImage1.Data[y + 1, x + 1, 0] == 0)
+                    {
+                        resultImage2.Data[y, x, 0] = 0;
+                    }
+                }
+            }
+
+            // xor
+            for (int y = 0; y < resultImage1.Height; y++)
+            {
+                for (int x = 0; x < resultImage1.Width; x++)
+                {
+                    if (resultImage1.Data[y, x, 0] == 0 && resultImage2.Data[y, x, 0] == 0)
+                    {
+                        resultImageXor.Data[y, x, 0] = 0;
+                    }
+                    else if (resultImage1.Data[y, x, 0] == 0 && resultImage2.Data[y, x, 0] == 255)
+                    {
+                        resultImageXor.Data[y, x, 0] = 255;
+                    }
+                    else if (resultImage1.Data[y, x, 0] == 255 && resultImage2.Data[y, x, 0] == 0)
+                    {
+                        resultImageXor.Data[y, x, 0] = 255;
+                    }
+                    else
+                    {
+                        resultImageXor.Data[y, x, 0] = 0;
+                    }
+                }
+            }
+
+            return resultImageXor;
+
+        }
+
     }
 
 }
