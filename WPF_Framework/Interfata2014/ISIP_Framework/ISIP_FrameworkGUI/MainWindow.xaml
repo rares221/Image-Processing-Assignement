@@ -29,7 +29,8 @@
                 <MenuItem Header="Invert" Click="Invert_Click"/>
                 <MenuItem Header="Gamma Operator" Click="Gamma_Operator_Click"/>
                 <MenuItem Header="Adaptive Binarization" Click="ATH_Click"/>
-                
+                <MenuItem Header=" Bilinear Rotation" Click="Rot_Click"/>
+
 
 
             </MenuItem>

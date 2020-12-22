@@ -268,5 +268,19 @@ namespace ISIP_FrameworkGUI
             }
 
         }
+        private void Rot_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                UserInputDialog dlg = new UserInputDialog("Unghi", new string[] { "Unghiul de rotatie" });
+
+                if (dlg.ShowDialog().Value)
+                {
+                    double t = (double)dlg.Values[0];
+                    mainControl.ProcessedGrayscaleImage = Tools.BilinearRotation(mainControl.OriginalGrayscaleImage,t);
+                }
+            }
+
+        }
     }
 }

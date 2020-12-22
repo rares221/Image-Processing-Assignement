@@ -315,19 +315,19 @@ namespace ISIP_Algorithms.Tools
                     }
                     else
                          if (resultImage1.Data[y, x, 0] == 255 && resultImage1.Data[y - 1, x - 1, 0] == 0)
-                    {
+                         {
                         resultImage2.Data[y, x, 0] = 0;
-                    }
+                         }
                     else
                          if (resultImage1.Data[y, x, 0] == 255 && resultImage1.Data[y - 1, x, 0] == 0)
-                    {
+                         {
                         resultImage2.Data[y, x, 0] = 0;
-                    }
+                         }
                     else
                          if (resultImage1.Data[y, x, 0] == 255 && resultImage1.Data[y + 1, x + 1, 0] == 0)
-                    {
+                         {
                         resultImage2.Data[y, x, 0] = 0;
-                    }
+                         }
                 }
             }
 
@@ -357,6 +357,40 @@ namespace ISIP_Algorithms.Tools
 
             return resultImageXor;
 
+        }
+        public static Image<Gray, byte> BilinearRotation(Image<Gray, byte> inputImage, double degrees)
+        {
+            int sourceHeight = inputImage.Height;
+            int sourceWidth = inputImage.Width;
+
+            int y0 = sourceHeight / 2;
+            int x0 = sourceWidth / 2;
+
+            double radians = degrees * Math.PI / 180f;
+
+            double cos = Math.Cos(radians);
+            double sin = Math.Sin(radians);
+
+            Image<Gray, byte> result = new Image<Gray, byte>(inputImage.Size);
+
+            for (int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+
+                    double xC = (x - x0) * cos - (y - y0) * sin + x0;
+                    double yC = (x - x0) * sin + (y - y0) * cos + y0;
+
+                    if (yC >= 0 && yC < result.Height - 1 &&
+                        xC >= 0 && xC < result.Width - 1
+                     )
+                    {
+                        result.Data[(int)yC, (int)xC, 0] = inputImage.Data[y, x, 0];
+                    }
+                }
+            }
+
+            return result;
         }
 
     }
