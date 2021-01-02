@@ -220,7 +220,17 @@ namespace ISIP_FrameworkGUI
             }
 
         }
-      
+        private void Simple_Click(object sender, RoutedEventArgs e)
+        {
+            UserInputDialog dlg = new UserInputDialog("Prag pentru binarizare ", new string[] { "dim" });
+            if (dlg.ShowDialog().Value == true)
+            {
+                int dim = (int)dlg.Values[0];
+                mainControl.ProcessedGrayscaleImage = Tools.BinarizareSimpla(mainControl.OriginalGrayscaleImage, dim);
+            }
+
+        }
+
         private void Bil_Click(object sender, RoutedEventArgs e)
         {
             double sigmaD;
@@ -228,7 +238,7 @@ namespace ISIP_FrameworkGUI
             if (mainControl.OriginalGrayscaleImage != null)
             {
 
-                UserInputDialog dlg = new UserInputDialog("Introduceti cele doua sigma", new string[] { "t1", "t2" });
+                UserInputDialog dlg = new UserInputDialog("Introduceti cele doua sigma", new string[] { "sigmaD", "sigmaR" });
 
                 if (dlg.ShowDialog().Value == true)
                 {
@@ -250,7 +260,33 @@ namespace ISIP_FrameworkGUI
                 if (dlg.ShowDialog().Value)
                 {
                     int t = (int)dlg.Values[0];
-                    mainControl.ProcessedGrayscaleImage = Tools.SobelDirectional(mainControl.OriginalGrayscaleImage, t);
+                    mainControl.ProcessedGrayscaleImage = Tools.Sobel(mainControl.OriginalGrayscaleImage,t);
+                }
+            }
+        }
+        private void Sob2_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                UserInputDialog dlg = new UserInputDialog("Prag", new string[] { "Prag" });
+
+                if (dlg.ShowDialog().Value)
+                {
+                    int t = (int)dlg.Values[0];
+                    mainControl.ProcessedGrayscaleImage = Tools.SobelVertical(mainControl.OriginalGrayscaleImage, t);
+                }
+            }
+        }
+        private void Sob3_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                UserInputDialog dlg = new UserInputDialog("Prag", new string[] { "Prag" });
+
+                if (dlg.ShowDialog().Value)
+                {
+                    int t = (int)dlg.Values[0];
+                    mainControl.ProcessedGrayscaleImage = Tools.SobelOrizontal(mainControl.OriginalGrayscaleImage, t);
                 }
             }
         }

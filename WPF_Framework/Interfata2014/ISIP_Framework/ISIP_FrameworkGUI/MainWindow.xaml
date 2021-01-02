@@ -30,6 +30,7 @@
                 <MenuItem Header="Gamma Operator" Click="Gamma_Operator_Click"/>
                 <MenuItem Header="Adaptive Binarization" Click="ATH_Click"/>
                 <MenuItem Header=" Bilinear Rotation" Click="Rot_Click"/>
+                <MenuItem Header=" Binarizare Simpla" Click="Simple_Click"/>
 
 
 
@@ -37,6 +38,8 @@
             <MenuItem Header="Filters">
                 <MenuItem Header="Median Filter" Click="Med_Click"/>
                 <MenuItem Header="Sobel Directional Filter" Click="Sob_Click"/>
+                <MenuItem Header="Sobel Vertical" Click="Sob2_Click"/>
+                <MenuItem Header="Sobel Orizontal" Click="Sob3_Click"/>
                 <MenuItem Header="Filtru Bilateral" Click="Bil_Click"/>
 
             </MenuItem>
