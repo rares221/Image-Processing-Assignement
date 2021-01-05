@@ -140,7 +140,7 @@ namespace ISIP_Algorithms.Tools
         private static int Median(int y, int x, Image<Gray, byte> InputImage, int mask)
         {
             List<int> pixels = new List<int>();
-
+            //parcurg dimensiunea mastii
             for (int i = 0; i < mask * mask - 1; i++)
             {
                 int x1 = i / mask;
@@ -151,11 +151,13 @@ namespace ISIP_Algorithms.Tools
 
             pixels.Sort();
             int value = pixels.ElementAt(pixels.Count() / 2);
+            // mediana basic
             return value;
         }
         public static Image<Gray, byte> MedianFilter(Image<Gray, byte> InputImage, int mask)
         {
             Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
+            //parcurg imaginea
             for (int y = 0; y < InputImage.Height; y++)
             {
                 for (int x = 0; x < InputImage.Width; x++)
@@ -168,13 +170,10 @@ namespace ISIP_Algorithms.Tools
             }
             return Result;
         }
-        public static Image<Gray, byte> BilateralFilter(Image<Gray, byte> InputImage, double sigmaD, double sigmaR)
+        public static double[,] Gauss_m(double sigma)
         {
-            Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
-            int dim;
-            double pi = Math.PI;
-            double e = Math.E;
-            dim = (int)(sigmaD * 4) + 1;
+
+            int dim = (int)(4 * sigma) + 1;
 
             if (dim % 2 == 0)
             {
@@ -182,92 +181,110 @@ namespace ISIP_Algorithms.Tools
             }
 
             double[,] mat = new double[dim, dim];
-            for (int i = 0; i < dim; i++)
-            {
-                for (int j = 0; j < dim; j++)
-                {
-                    mat[i, j] = (1 / (2 * pi * Math.Pow(sigmaD, 2)) * Math.Pow(e, -((i - dim / 2) * (i - dim / 2) + (j - dim / 2) * (j - dim / 2)) / (2 * Math.Pow(sigmaD, 2))));
-                }
-            }
-            double c = 0;
+
             double sum = 0;
-            for (int i = 0; i < dim; i++)
+
+            int interval = (int)(sigma * 2);
+
+            for (int y = -interval; y <= interval; y++)
             {
-                for (int j = 0; j < dim; j++)
+                for (int x = -interval; x <= interval; x++)
                 {
-                    sum += mat[i, j];
-                }
-            }
-            c = 1 / sum;
-            for (int i = 0; i < dim; i++)
-            {
-                for (int j = 0; j < dim; j++)
-                {
-                    mat[i, j] = mat[i, j] * c;
+                    //HD formula din curs
+                    mat[y + interval, x + interval] = 1d / (2 * Math.PI * sigma * sigma) * Math.Exp(-((y * y) + (x * x)) / (2 * sigma * sigma));
+
+                    sum += mat[y + interval, x + interval];
                 }
             }
 
-            for (int y = dim / 2; y < InputImage.Height - (dim / 2); y++)
+            for (int y = 0; y < dim; y++)
             {
-                for (int x = dim / 2; x < InputImage.Width - (dim / 2); x++)
+                for (int x = 0; x < dim; x++)
                 {
-                    double sum1 = 0;
-                    double sum2 = 0;
-                    double diff1 = 0;
-                    for (int i = 0; i < dim; i++)
+                    // inmultesc cu fiecare element din masca
+                    mat[y, x] = mat[y, x] * 1d / sum;
+                }
+            }
+            return mat;
+        }
+       
+            
+        public static Image<Gray, byte> Filtrare_bilaterala(Image<Gray, byte> InputImage, double sigmaD, double sigmaR)
+        {
+            Image<Gray, byte> Result = InputImage.Clone();
+            int width = InputImage.Width;
+            int height = InputImage.Height;
+            //iau masca 
+            double[,] mask = Gauss_m(sigmaD);
+
+            int interval = (mask.GetLength(0) - 1) / 2;
+            //iau intervalul
+            int dim = mask.GetLength(0);
+
+
+            for (int y = interval; y < height - interval; y++)
+            {
+                for (int x = interval; x < width - interval; x++)
+                {
+                    double sum1 = 0.0;
+                    double sum2 = 0.0;
+                    for (int i = -interval; i < interval; i++)
                     {
-                        for (int j = 0; j < dim; j++)
+                        for (int j = -interval; j < interval; j++)
                         {
-                            diff1 = mat[x, y] - mat[x + i, y + j];
-                            sum1 += InputImage.Data[y + i - dim / 2, x + j - dim / 2, 0] * mat[i, j] * Hr(diff1, sigmaR);
-                            sum2 = mat[i, j] * Hr(diff1, sigmaR);
+                            //prima parte a sumei
+                            sum1 += (InputImage.Data[y + i, x + j, 0] * mask[i + interval, j + interval]) * Hr(InputImage.Data[y + i, x + j, 0] - InputImage.Data[y, x, 0], sigmaR);
+                            // a doua
+                            //ambele dupa formula
+                            sum2 += (mask[i + interval, j + interval]) * Hr(InputImage.Data[y + i, x + j, 0] - InputImage.Data[y, x, 0], sigmaR);
+
+                            
+
                         }
                     }
-                    Result.Data[y, x, 0] = (byte)((sum1 / sum2) + 0.5);
+
+                    //sum1/suma2
+                   double var = sum1 / sum2;
+                  
+                    Result.Data[y, x, 0] = (byte)(var + 0.5);
                 }
             }
             return Result;
         }
         public static double Hr(double diff, double sigmaR)
         {
-
             double e = Math.E;
             return Math.Pow(e, (-(diff * diff) / 2 * (sigmaR * sigmaR)));
-
-
         }
+
 
         public static Image<Gray,byte>Sobel(Image<Gray, byte> InputImage, int prag)
         {
             Image<Gray, byte> ResultImage = InputImage.Clone();
-            int[,] Sx = new int[3,3];
-            int[,] Sy = new int[3, 3];
-            int[] n = new int[] {1,2,1 };
-            int fy;
-            int fx;
-            int grad;
-            for(int i=0; i<3;i++)
-            {
-                Sx[i, 0] = -n[i];
-                Sx[i, 2] = n[i];
-                Sy[i, 0] = -n[i];
-                Sy[i, 2] = n[i];
-            }
+            //masca pt x
+            double[,] Sx = new double[3, 3] { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+            // masca pt x
+            double[,] Sy = new double[3, 3] { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
+            // masca pt y
+           double Fy;
+           double Fx;
+           
+          
 
             for(int y=1;y<InputImage.Height;y++)
             {
                 for(int x=1;x<InputImage.Width;x++)
                 {
-                    fx = 0;
-                    fy = 0;
+                    Fx = 0;
+                    Fy = 0;
                     for(int i=0;i<3;i++)
                         for(int j=0;j<3; j++)
                         {
-                            fx = fx + InputImage.Data[y - 1, x - 1, 0] * Sx[i, j];
-                            fy = fy + InputImage.Data[y - 1, x - 1, 0] * Sy[i, j];
+                            Fx = Fx + InputImage.Data[y - 1, x - 1, 0] * Sx[i, j];
+                            Fy = Fy + InputImage.Data[y - 1, x - 1, 0] * Sy[i, j];
 
                         }
-                    grad = (int)Math.Sqrt(fx * fx + fy * fy);
+                    double grad = Math.Sqrt(Fx * Fx + Fy * Fy);
                     if (grad < prag)
                     {
                         ResultImage.Data[y, x, 0] = 0;
@@ -287,7 +304,7 @@ namespace ISIP_Algorithms.Tools
         public static Image<Gray, byte> SobelVertical(Image<Gray, byte> InputImage, double t)
         {
             Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
-            // doua masti sobel
+            // doua 
             double[,] Sx = new double[3, 3] { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
             // masca pt x
             double[,] Sy = new double[3, 3] { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
@@ -376,7 +393,7 @@ namespace ISIP_Algorithms.Tools
                     double Fx = 0;
                     double Fy = 0;
 
-                    // parcurg vecinatatea pixelului cu mastile sx si sy
+                    // parcurg vecinatatea pixelului 
                     for (int i = 0; i <= 2; i++)
                     {
                         for (int j = 0; j <= 2; j++)

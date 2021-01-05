@@ -245,7 +245,7 @@ namespace ISIP_FrameworkGUI
                     sigmaD = (double)dlg.Values[0];
                     sigmaR = (double)dlg.Values[1];
 
-                    mainControl.ProcessedGrayscaleImage = Tools.BilateralFilter(mainControl.OriginalGrayscaleImage, sigmaD, sigmaR);
+                    mainControl.ProcessedGrayscaleImage = Tools.Filtrare_bilaterala(mainControl.OriginalGrayscaleImage, sigmaD, sigmaR);
                     
                 }
             }
@@ -264,6 +264,18 @@ namespace ISIP_FrameworkGUI
                 }
             }
         }
+      /*  private void Filtru_directional_Sobel_Click(object sender, RoutedEventArgs e)
+        {
+            UserInputDialog dlg = new UserInputDialog("T", new string[] { "T=" });
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                if (dlg.ShowDialog().Value == true)
+                {
+                    mainControl.ProcessedGrayscaleImage = FiltruSobelDirectional.SobelDirectional(mainControl.OriginalGrayscaleImage, xSobel, ySobel, (int)dlg.Values[0]);
+                }
+            }
+        }
+      */
         private void Sob2_Click(object sender, RoutedEventArgs e)
         {
             if (mainControl.OriginalGrayscaleImage != null)
