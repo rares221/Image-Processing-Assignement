@@ -260,22 +260,11 @@ namespace ISIP_FrameworkGUI
                 if (dlg.ShowDialog().Value)
                 {
                     int t = (int)dlg.Values[0];
-                    mainControl.ProcessedGrayscaleImage = Tools.Sobel(mainControl.OriginalGrayscaleImage,t);
+                    mainControl.ProcessedGrayscaleImage = Tools.SobelDirectional(mainControl.OriginalGrayscaleImage,t);
                 }
             }
         }
-      /*  private void Filtru_directional_Sobel_Click(object sender, RoutedEventArgs e)
-        {
-            UserInputDialog dlg = new UserInputDialog("T", new string[] { "T=" });
-            if (mainControl.OriginalGrayscaleImage != null)
-            {
-                if (dlg.ShowDialog().Value == true)
-                {
-                    mainControl.ProcessedGrayscaleImage = FiltruSobelDirectional.SobelDirectional(mainControl.OriginalGrayscaleImage, xSobel, ySobel, (int)dlg.Values[0]);
-                }
-            }
-        }
-      */
+    
         private void Sob2_Click(object sender, RoutedEventArgs e)
         {
             if (mainControl.OriginalGrayscaleImage != null)
@@ -329,6 +318,19 @@ namespace ISIP_FrameworkGUI
                 }
             }
 
+        }
+        private void Hough_click(object sender, RoutedEventArgs e)
+        {
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                UserInputDialog dlg = new UserInputDialog("Prag", new string[] { "Prag" });
+
+                if (dlg.ShowDialog().Value)
+                {
+                    int t = (int)dlg.Values[0];
+                    mainControl.ProcessedGrayscaleImage = Tools.Hough(mainControl.OriginalGrayscaleImage, t);
+                }
+            }
         }
     }
 }

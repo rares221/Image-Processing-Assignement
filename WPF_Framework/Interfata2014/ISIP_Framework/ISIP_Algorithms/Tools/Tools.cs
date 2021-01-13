@@ -258,49 +258,7 @@ namespace ISIP_Algorithms.Tools
         }
 
 
-        public static Image<Gray,byte>Sobel(Image<Gray, byte> InputImage, int prag)
-        {
-            Image<Gray, byte> ResultImage = InputImage.Clone();
-            //masca pt x
-            double[,] Sx = new double[3, 3] { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
-            // masca pt x
-            double[,] Sy = new double[3, 3] { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
-            // masca pt y
-           double Fy;
-           double Fx;
-           
-          
-
-            for(int y=1;y<InputImage.Height;y++)
-            {
-                for(int x=1;x<InputImage.Width;x++)
-                {
-                    Fx = 0;
-                    Fy = 0;
-                    for(int i=0;i<3;i++)
-                        for(int j=0;j<3; j++)
-                        {
-                            Fx = Fx + InputImage.Data[y - 1, x - 1, 0] * Sx[i, j];
-                            Fy = Fy + InputImage.Data[y - 1, x - 1, 0] * Sy[i, j];
-
-                        }
-                    double grad = Math.Sqrt(Fx * Fx + Fy * Fy);
-                    if (grad < prag)
-                    {
-                        ResultImage.Data[y, x, 0] = 0;
-                    }
-                    else {
-                        ResultImage.Data[y, x, 0] = 255;
-
-
-                    }
-
-                }
-            }
-            return ResultImage;
-
-
-        }
+        
         public static Image<Gray, byte> SobelVertical(Image<Gray, byte> InputImage, double t)
         {
             Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
@@ -309,7 +267,7 @@ namespace ISIP_Algorithms.Tools
             // masca pt x
             double[,] Sy = new double[3, 3] { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
             // masca pt y
-            //sy e transpusa lui sy
+            //
             const double rad = 180 / Math.PI;
             //conversia la radiani
             for (int y = 1; y < InputImage.Height - 1; y++)
@@ -369,6 +327,67 @@ namespace ISIP_Algorithms.Tools
                             Result.Data[y, x, 0] = (byte)(0);
                             //devine negru
                         }
+                    }
+                }
+            }
+
+            return Result;
+        }
+        
+        public static Image<Gray, byte> SobelDirectional(Image<Gray, byte> InputImage, double t)
+        {
+            Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
+            // doua masti sobel
+            double[,] Sx = new double[3, 3] { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+            // masca pt x
+            double[,] Sy = new double[3, 3] { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
+            // masca pt y
+            //sy e transpusa lui sy
+            const double rad = 180 / Math.PI;
+            //conversia la radiani
+            for (int y = 1; y < InputImage.Height - 1; y++)
+            {
+                for (int x = 1; x < InputImage.Width - 1; x++)
+                {
+                    double Fx = 0;
+                    double Fy = 0;
+
+                    // parcurg vecinatatea pixelului 
+                    for (int i = 0; i <= 2; i++)
+                    {
+                        for (int j = 0; j <= 2; j++)
+                        {
+                            // fuctiile rezultat 
+                            // inmultesc o masca cu imaginea
+                            // in f-uri fac suma la inmutirile astea 
+                            // vezi foile numerotate, cred ca foaia 8
+                            Fx += InputImage.Data[y + i - 1, x + j - 1, 0] * Sx[i, j];
+                            Fy += InputImage.Data[y + i - 1, x + j - 1, 0] * Sy[i, j];
+                        }
+                    }
+
+                    double grad = Math.Sqrt(Fx * Fx + Fy * Fy);
+                    //formula  , vezi curs
+                    double theta = 0;
+
+                    // compar cu un treshold initial
+                    if (grad < t)
+                    {
+                        Result.Data[y, x, 0] = (byte)(0);
+                        // devine negru
+                    }
+                    else
+                    {
+                        theta = Math.Atan2(Fy, Fx);
+                        // arctangenta dintre cele 2 puncte
+                        double grade = theta * rad;
+                        // ca sa verific cat de mare e gradul, convertesc la grade
+                        if (grade >= -180 && grade <= 180)
+                        {
+                            int rez = (int)((grade + 180) * (255 - 127)) / 360 + 127;
+                            Result.Data[y, x, 0] = (byte)rez;
+                        }
+
                     }
                 }
             }
@@ -485,6 +504,7 @@ namespace ISIP_Algorithms.Tools
             //dilatare
             // iau o matrice de 3x3 pe care ma plimb pe toata imaginea
             //in jurul pixelului care ma intereseaza, daca gasesc un pixel colorat atunci fac ,il igros 
+            /*
             for (int y = 1; y < resultImage1.Height - 1; y++)
             {
                 for (int x = 1; x < resultImage1.Width - 1; x++)
@@ -500,10 +520,28 @@ namespace ISIP_Algorithms.Tools
                     }
                 }
             }
+            */
+            for (int y = 1; y < resultImage1.Height - 1; y++)
+            {
+                for (int x = 1; x < resultImage1.Width - 1; x++)
+                {
+                    if(resultImage1.Data[y-1,x-1,0]==255 && resultImage1.Data[y - 1, x, 0] == 255 && resultImage1.Data[y - 1, x + 1, 0] == 255&& resultImage1.Data[y, x - 1, 0] == 255&&
+                        resultImage1.Data[y, x, 0] == 255&& resultImage1.Data[y, x + 1, 0] == 255&& resultImage1.Data[y + 1, x - 1, 0] == 255&& resultImage1.Data[y + 1, x, 0] == 255&& resultImage1.Data[y + 1, x + 1, 0] == 255)
+                    {
+                        resultImage2.Data[y, x, 0] = 255;
+                    }
+                    else
+                    {
+                        resultImage2.Data[y, x, 0] = 0;
+                    }
+                }
+            }
 
-            // xor
-            // folosind imaginea dilatata si cea binarizata eu aplic regula matematica
-            for (int y = 0; y < resultImage1.Height; y++)
+
+
+                    // xor
+                    // folosind imaginea dilatata si cea binarizata eu aplic regula matematica
+                    for (int y = 0; y < resultImage1.Height; y++)
             {
                 for (int x = 0; x < resultImage1.Width; x++)
                 {
@@ -554,7 +592,7 @@ namespace ISIP_Algorithms.Tools
 
                     double xC = (x - xO) * cos - (y - yO) * sin + xO;
                     double yC = (x - xO) * sin+ (y - yO) * cos + yO;
-                    //formulele din explicatia de laborator/vezi foile numerotate
+                    //formulele din explicatia la laborator/vezi foile numerotate
                     int y0 = (int)yC;
                     int x0 = (int)xC;
                     //convertesc la int
@@ -580,6 +618,94 @@ namespace ISIP_Algorithms.Tools
             }
 
             return result;
+        }
+        public static Image<Gray, byte> SobleChior(Image<Gray, byte> InputImage, double t1)
+        {
+            Image<Gray, byte> result = InputImage.Clone();
+
+            int[,] Sx = new int[3, 3] { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+            int[,] Sy = new int[3, 3] { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
+
+            for (int y = 1; y < InputImage.Height - 1; y++)
+            {
+                for (int x = 1; x < InputImage.Width - 1; x++)
+                {
+                    double Fx = 0;
+                    double Fy = 0;
+
+                    // parcurg vecinatatea pixelului 
+                    for (int i = 0; i <= 2; i++)
+                    {
+                        for (int j = 0; j <= 2; j++)
+                        {
+                            // fuctiile rezultat 
+                            // inmultesc o masca cu imaginea
+                            // in f-uri fac suma la inmutirile astea 
+                            // vezi foile numerotate, cred ca foaia 8
+                            Fx += InputImage.Data[y + i - 1, x + j - 1, 0] * Sx[i, j];
+                            Fy += InputImage.Data[y + i - 1, x + j - 1, 0] * Sy[i, j];
+                        }
+                    }
+
+                    double gradient = Math.Sqrt(Fx * Fx + Fy * Fy);
+                    System.Math.Abs(gradient);
+                    if (gradient <= t1)
+                        result.Data[y, x, 0] = 0;
+                    else
+                        result.Data[y, x, 0] = 255;
+
+
+
+                }
+            }
+
+            return result;
+        }
+
+        public static Image<Gray, byte> Hough(Image<Gray, byte> InputImage, double t1)
+        {
+            Image<Gray, byte> SobelImage = SobleChior(InputImage, t1);
+            //formula din curs
+            int diagonal = (int)Math.Sqrt(InputImage.Width * InputImage.Width + InputImage.Height * InputImage.Height);
+            //imaginea mea finala 
+            Image<Gray, int> Hough = new Image<Gray, int>(2 * diagonal + 1, 180+1);
+
+            for (int y = 0; y < SobelImage.Height; y++)
+            {
+                for (int x = 0; x < SobelImage.Width; x++)
+                {
+                    if (SobelImage.Data[y, x, 0] == 255)
+                    {
+                        for (int angle = -90; angle <= 90; angle++)
+                        {
+                            double radangle = (angle) * (Math.PI / 180);
+                            //formula din curs
+                            double r = x * Math.Cos(radangle) + y * Math.Sin(radangle);
+                            //partea de incrementare
+                            Hough.Data[angle+90 , (int)r + diagonal, 0]++;
+                        }
+                    }
+                }
+            }
+
+            Image<Gray, byte> Result = new Image<Gray, byte>(Hough.Size);
+            for (int y = 0; y < Hough.Height; y++)
+            {
+                for (int x = 0; x < Hough.Width; x++)
+                {
+                    if (Hough.Data[y, x, 0] <= 255)
+                    {
+                        Result.Data[y, x, 0] = (byte)(Hough.Data[y, x, 0]);
+                       
+                    }
+                    else
+                    {
+                        Result.Data[y, x, 0] = 255;
+                    }
+                }
+            }
+
+            return Result;
         }
 
     }

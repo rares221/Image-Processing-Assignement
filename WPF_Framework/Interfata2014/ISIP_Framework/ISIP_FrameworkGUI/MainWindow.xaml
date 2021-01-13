@@ -44,6 +44,7 @@
 
             </MenuItem>
             <MenuItem Header="XOR" Click="Xor_Click"/>
+            <MenuItem Header="Hough 2 cadrane" Click="Hough_click"/>
             
             <MenuItem Header="Save as original image" HorizontalAlignment="Right"
                       Click="saveAsOriginalMenuItem_Click"/>
